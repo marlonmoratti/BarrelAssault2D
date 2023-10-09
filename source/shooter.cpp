@@ -55,3 +55,21 @@ tuple<Point, Point> Shooter::getHitBox() {
         Point(x + headRadius, y + headRadius)
     };
 }
+
+Shot* Shooter::shoot() {
+    Point p1, p2;
+    GLfloat gunWidth = 2*headRadius/3., gunHeight = 4*headRadius;
+
+    p2.translate(0, gunHeight);
+    p2.rotate(aimingAngle);
+    p2.translate(x + (headRadius + gunWidth/2.), y - headRadius);
+
+    p1.rotate(aimingAngle);
+    p1.translate(x + (headRadius + gunWidth/2.), y - headRadius);
+
+    GLfloat x0 = p2.x - p1.x, y0 = p2.y - p1.y,
+        norm = sqrt(pow(x0, 2) + pow(y0, 2));
+    x0 /= norm; y0 /= norm;
+
+    return new Shot(p2.x, p2.y, atan2(y0, x0));
+}

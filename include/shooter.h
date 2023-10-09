@@ -5,6 +5,7 @@
 #include <tuple>
 
 #include "point.h"
+#include "shot.h"
 
 using namespace std;
 
@@ -23,6 +24,7 @@ public:
     void move(GLfloat dx, GLfloat dy);
     void adjustAimingAngle(GLfloat dt);
     tuple<Point, Point> getHitBox();
+    Shot* shoot();
 };
 
 #endif

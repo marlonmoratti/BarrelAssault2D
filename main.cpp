@@ -4,6 +4,7 @@
 #include "tinyxml2/tinyxml2.hpp"
 #include "include/arena.h"
 #include "include/shooter.h"
+#include "include/shot.h"
 
 using namespace std;
 using namespace tinyxml2;
@@ -21,6 +22,9 @@ Shooter gPlayer;
 GLfloat gPlayerHeadRadius;
 GLfloat gPlayerSpeed;
 
+Shot* shot = nullptr;
+GLfloat gShotRadius = 10, gShotSpeed = 50;
+
 void init() {
     glClearColor(0.0, 0.0, 0.0, 1.0);
 
@@ -34,24 +38,24 @@ void movePlayer(GLdouble dt) {
     auto [pLeftBottom, pRightTop] = gPlayer.getHitBox();
     auto [aLeftBottom, aRightTop] = gArena.getBoundaries();
 
-    GLfloat dx = 0, dy = 0, inc = gPlayerSpeed * dt;
+    GLfloat dx = 0, dy = 0, wallDistance = 0, inc = (gPlayerSpeed * dt);
     if(keyStatus[(int)('a')]) {
-        GLfloat wallDistance = abs(aLeftBottom.x - pLeftBottom.x);
+        wallDistance = abs(aLeftBottom.x - pLeftBottom.x);
         dx -= (pLeftBottom.x - inc > aLeftBottom.x) ? inc : wallDistance;
     }
 
     if(keyStatus[(int)('d')]) {
-        GLfloat wallDistance = abs(aRightTop.x - pRightTop.x);
+        wallDistance = abs(aRightTop.x - pRightTop.x);
         dx += (pRightTop.x + inc < aRightTop.x) ? inc : wallDistance;
     }
 
     if(keyStatus[(int)('s')]) {
-        GLfloat wallDistance = abs(aLeftBottom.y - pLeftBottom.y);
+        wallDistance = abs(aLeftBottom.y - pLeftBottom.y);
         dy -= (pLeftBottom.y - inc > aLeftBottom.y) ? inc : wallDistance;
     }
 
     if(keyStatus[(int)('w')]) {
-        GLfloat wallDistance = abs(aRightTop.y - pRightTop.y);
+        wallDistance = abs(aRightTop.y - pRightTop.y);
         dy += (pRightTop.y + inc < aRightTop.y) ? inc : wallDistance;
     }
     gPlayer.move(dx, dy);
@@ -66,6 +70,20 @@ void idle() {
 
     movePlayer(timeDiference);
 
+    if(shot){
+        shot->move();
+
+        //Trata colisao
+        // if (alvo.Atingido(tiro)){
+        //     alvo.Recria(rand()%500 - 250, 200);
+        // }
+
+        if (!shot->isValid()){ 
+            delete shot;
+            shot = NULL;
+        }
+    }
+
     glutPostRedisplay();
 }
 
@@ -74,6 +92,8 @@ void display() {
 
     gArena.draw();
     gPlayer.draw();
+
+    if (shot) shot->draw();
 
     glutSwapBuffers();
 }
@@ -98,6 +118,12 @@ void mouseMotion(int x, int y) {
 
     gPlayer.adjustAimingAngle(-delta * AIMING_SENSITIVITY);
     glutPostRedisplay();
+}
+
+void mouseClick(int button, int state, int x, int y) {
+    if (button == 0 && state == 0 && shot == nullptr) {
+        shot = gPlayer.shoot();
+    }
 }
 
 void loadConfiguration() {
@@ -151,6 +177,7 @@ int main(int argc, char *argv[]) {
     glutKeyboardFunc(keyDown);
     glutKeyboardUpFunc(keyUp);
     glutPassiveMotionFunc(mouseMotion);
+    glutMouseFunc(mouseClick);
 
     init();
 
