@@ -34,21 +34,25 @@ void movePlayer(GLdouble dt) {
     auto [pLeftBottom, pRightTop] = gPlayer.getHitBox();
     auto [aLeftBottom, aRightTop] = gArena.getBoundaries();
 
-    GLfloat dx = 0, dy = 0;
-    if(keyStatus[(int)('a')] && pLeftBottom.x > aLeftBottom.x) {
-        dx -= gPlayerSpeed * dt;
+    GLfloat dx = 0, dy = 0, inc = gPlayerSpeed * dt;
+    if(keyStatus[(int)('a')]) {
+        GLfloat wallDistance = abs(aLeftBottom.x - pLeftBottom.x);
+        dx -= (pLeftBottom.x - inc > aLeftBottom.x) ? inc : wallDistance;
     }
 
-    if(keyStatus[(int)('d')] && pRightTop.x < aRightTop.x) {
-        dx += gPlayerSpeed * dt;
+    if(keyStatus[(int)('d')]) {
+        GLfloat wallDistance = abs(aRightTop.x - pRightTop.x);
+        dx += (pRightTop.x + inc < aRightTop.x) ? inc : wallDistance;
     }
 
-    if(keyStatus[(int)('w')] && pRightTop.y < aRightTop.y) {
-        dy += gPlayerSpeed * dt;
+    if(keyStatus[(int)('s')]) {
+        GLfloat wallDistance = abs(aLeftBottom.y - pLeftBottom.y);
+        dy -= (pLeftBottom.y - inc > aLeftBottom.y) ? inc : wallDistance;
     }
 
-    if(keyStatus[(int)('s')] && pLeftBottom.y > aLeftBottom.y) {
-        dy -= gPlayerSpeed * dt;
+    if(keyStatus[(int)('w')]) {
+        GLfloat wallDistance = abs(aRightTop.y - pRightTop.y);
+        dy += (pRightTop.y + inc < aRightTop.y) ? inc : wallDistance;
     }
     gPlayer.move(dx, dy);
 }

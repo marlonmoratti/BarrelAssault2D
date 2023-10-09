@@ -13,6 +13,6 @@ void Arena::draw() {
 tuple<Point, Point> Arena::getBoundaries() {
     return {
         Point(-width/2., -height/2.),
-        Point( width/2.,         0.),
+        Point( width/2., -lineWidth/2.),
     };
 }
