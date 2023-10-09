@@ -9,11 +9,11 @@
 using namespace std;
 
 class Shooter {
-    GLfloat x, y, headRadius, aimingAngle = 0;
+    GLfloat x, y, headRadius, aimingAngle = 0, footAngle = 0;
     tuple<GLfloat, GLfloat, GLfloat> color;
 
     void drawBody(GLfloat x, GLfloat y, GLfloat radius);
-    void drawFoot(GLfloat x, GLfloat y, GLfloat width, GLfloat height);
+    void drawFoot(GLfloat x, GLfloat y, GLfloat width, GLfloat height, GLfloat angle);
     void drawGun(GLfloat x, GLfloat y, GLfloat width, GLfloat height, GLfloat angle);
 public:
     Shooter(GLfloat x=0, GLfloat y=0, GLfloat headRadius=0, tuple<GLfloat, GLfloat, GLfloat> color={0, 0, 0})

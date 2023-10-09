@@ -10,9 +10,10 @@ void Shooter::drawBody(GLfloat x, GLfloat y, GLfloat radius) {
     glPopMatrix();
 }
 
-void Shooter::drawFoot(GLfloat x, GLfloat y, GLfloat width, GLfloat height) {
+void Shooter::drawFoot(GLfloat x, GLfloat y, GLfloat width, GLfloat height, GLfloat angle) {
     glPushMatrix();
         glTranslatef(x, y, 0);
+        glRotatef(angle, 1, 0, 0);
         Shape::drawRectangle(width, height, {0, 0, 0});
     glPopMatrix();
 }
@@ -27,8 +28,8 @@ void Shooter::drawGun(GLfloat x, GLfloat y, GLfloat width, GLfloat height, GLflo
 
 void Shooter::draw() {
     GLfloat footWidth = headRadius/2, footHeight = 2*headRadius;
-    drawFoot(x - (headRadius - footWidth), y - headRadius, footWidth, footHeight);
-    drawFoot(x + (headRadius - footWidth), y - headRadius, footWidth, footHeight);
+    drawFoot(x - (headRadius - footWidth), y, footWidth, -footHeight, -footAngle);
+    drawFoot(x + (headRadius - footWidth), y, footWidth, footHeight, footAngle);
 
     drawBody(x, y, headRadius);
 
@@ -38,6 +39,7 @@ void Shooter::draw() {
 
 void Shooter::move(GLfloat dx, GLfloat dy) {
     x += dx; y += dy;
+    footAngle += (dy/headRadius) * 180/M_PI;
 }
 
 void Shooter::adjustAimingAngle(GLfloat dt) {
