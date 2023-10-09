@@ -4,6 +4,8 @@
 #include <GL/gl.h>
 #include <tuple>
 
+#include "point.h"
+
 using namespace std;
 
 class Shooter {
@@ -18,6 +20,9 @@ public:
             : x(x), y(y), headRadius(headRadius), color(color) {};
 
     void draw();
+    void move(GLfloat dx, GLfloat dy);
+    void adjustAimingAngle(GLfloat dt);
+    tuple<Point, Point> getHitBox();
 };
 
 #endif

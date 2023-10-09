@@ -1,3 +1,5 @@
+#include <math.h>
+
 #include "../include/shooter.h"
 #include "../include/shape.h"
 
@@ -32,4 +34,22 @@ void Shooter::draw() {
 
     GLfloat gunWidth = 2*headRadius/3., gunHeight = 4*headRadius;
     drawGun(x + (headRadius + gunWidth/2.), y - headRadius, gunWidth, gunHeight, aimingAngle);
+}
+
+void Shooter::move(GLfloat dx, GLfloat dy) {
+    x += dx; y += dy;
+}
+
+void Shooter::adjustAimingAngle(GLfloat dt) {
+    GLfloat angle = aimingAngle + dt;
+    if (abs(angle) <= 30) {
+        aimingAngle = angle;
+    }
+}
+
+tuple<Point, Point> Shooter::getHitBox() {
+    return {
+        Point(x - headRadius, y - headRadius),
+        Point(x + headRadius, y + headRadius)
+    };
 }

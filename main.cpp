@@ -8,6 +8,10 @@
 using namespace std;
 using namespace tinyxml2;
 
+#define AIMING_SENSITIVITY 0.2
+
+int keyStatus[256] = { 0 };
+
 // Window dimensions
 GLint gWidth, gHeight;
 
@@ -26,12 +30,37 @@ void init() {
     glLoadIdentity();
 }
 
+void movePlayer(GLdouble dt) {
+    auto [pLeftBottom, pRightTop] = gPlayer.getHitBox();
+    auto [aLeftBottom, aRightTop] = gArena.getBoundaries();
+
+    GLfloat dx = 0, dy = 0;
+    if(keyStatus[(int)('a')] && pLeftBottom.x > aLeftBottom.x) {
+        dx -= gPlayerSpeed * dt;
+    }
+
+    if(keyStatus[(int)('d')] && pRightTop.x < aRightTop.x) {
+        dx += gPlayerSpeed * dt;
+    }
+
+    if(keyStatus[(int)('w')] && pRightTop.y < aRightTop.y) {
+        dy += gPlayerSpeed * dt;
+    }
+
+    if(keyStatus[(int)('s')] && pLeftBottom.y > aLeftBottom.y) {
+        dy -= gPlayerSpeed * dt;
+    }
+    gPlayer.move(dx, dy);
+}
+
 void idle() {
     static GLdouble previousTime = glutGet(GLUT_ELAPSED_TIME);
     GLdouble currentTime, timeDiference;
     currentTime = glutGet(GLUT_ELAPSED_TIME);
     timeDiference = currentTime - previousTime;
     previousTime = currentTime;
+
+    movePlayer(timeDiference);
 
     glutPostRedisplay();
 }
@@ -43,6 +72,28 @@ void display() {
     gPlayer.draw();
 
     glutSwapBuffers();
+}
+
+void keyDown(unsigned char key, int x, int y) {
+    keyStatus[(int)(key)] = 1;
+    glutPostRedisplay();
+}
+
+void keyUp(unsigned char key, int x, int y) {
+    keyStatus[(int)(key)] = 0;
+    glutPostRedisplay();
+}
+
+void mouseMotion(int x, int y) {
+    static int previousPosition = x;
+    int currentPosition, delta;
+
+    currentPosition = x;
+    delta = currentPosition - previousPosition;
+    previousPosition = x;
+
+    gPlayer.adjustAimingAngle(-delta * AIMING_SENSITIVITY);
+    glutPostRedisplay();
 }
 
 void loadConfiguration() {
@@ -59,23 +110,16 @@ void loadConfiguration() {
     }
 
     XMLElement* arena = rootElement->FirstChildElement("arena");
-    gWidth = stoi(arena->Attribute("largura"));
-    gHeight = stoi(arena->Attribute("altura"));
+    gWidth = stof(arena->Attribute("largura"));
+    gHeight = stof(arena->Attribute("altura"));
 
     XMLElement* jogador = rootElement->FirstChildElement("jogador");
-    gPlayerHeadRadius = stoi(jogador->Attribute("raioCabeca"));
-    gPlayerSpeed = stoi(jogador->Attribute("velocidade"));
+    gPlayerHeadRadius = stof(jogador->Attribute("raioCabeca"));
+    gPlayerSpeed = stof(jogador->Attribute("velocidade"));
 
     // XMLElement* inimigo = rootElement->FirstChildElement("inimigo");
     // XMLElement* barril = rootElement->FirstChildElement("barril");
     // XMLElement* tiro = rootElement->FirstChildElement("tiro");
-}
-
-int main(int argc, char *argv[]) {
-    glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
-
-    loadConfiguration();
 
     gArena = Arena(gWidth, gHeight);
     gPlayer = Shooter(0.0, -gHeight/4., gPlayerHeadRadius, {0, 1, 0});
@@ -83,6 +127,13 @@ int main(int argc, char *argv[]) {
     // auto [p1, p2] = gArena.getBoundaries();
     // cout << "p1.x: " << p1.x << " p1.y: " << p1.y << "\n";
     // cout << "p2.x: " << p2.x << " p2.y: " << p2.y << "\n";
+}
+
+int main(int argc, char *argv[]) {
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
+
+    loadConfiguration();
 
     // Create the window.
     glutInitWindowSize(gWidth, gHeight);
@@ -93,9 +144,9 @@ int main(int argc, char *argv[]) {
     glutDisplayFunc(display);
     glutIdleFunc(idle);
 
-    glutMouseFunc([](int button, int state, int x, int y) {
-        cout << "x: " << x << " y: " << y << "\n";
-    });
+    glutKeyboardFunc(keyDown);
+    glutKeyboardUpFunc(keyUp);
+    glutPassiveMotionFunc(mouseMotion);
 
     init();
 
