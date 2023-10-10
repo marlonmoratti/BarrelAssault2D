@@ -3,7 +3,7 @@
 #include "../include/shot.h"
 #include "../include/shape.h"
 
-#define MAX_DISTANCE 500
+extern GLfloat gShotMaxDistance;
 
 void Shot::draw() {
     glPushMatrix();
@@ -12,9 +12,9 @@ void Shot::draw() {
     glPopMatrix();
 }
 
-void Shot::move() {
-    x += speed * cos(angle);
-    y += speed * sin(angle);
+void Shot::move(GLdouble dt) {
+    x += (speed * cos(angle)) * dt;
+    y += (speed * sin(angle)) * dt;
 }
 
 Point Shot::getPosition() {
@@ -22,5 +22,5 @@ Point Shot::getPosition() {
 }
 
 bool Shot::isValid() {
-    return sqrt(pow(x - x0, 2) + pow(y - y0, 2)) < MAX_DISTANCE;
+    return sqrt(pow(x - x0, 2) + pow(y - y0, 2)) < gShotMaxDistance;
 }

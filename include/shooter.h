@@ -13,6 +13,8 @@ class Shooter {
     GLfloat x, y, headRadius, aimingAngle = 0, footAngle = 0;
     tuple<GLfloat, GLfloat, GLfloat> color;
 
+    tuple<GLfloat, GLfloat> getFootDimensions();
+    tuple<GLfloat, GLfloat> getGunDimensions();
     void drawBody(GLfloat x, GLfloat y, GLfloat radius);
     void drawFoot(GLfloat x, GLfloat y, GLfloat width, GLfloat height, GLfloat angle);
     void drawGun(GLfloat x, GLfloat y, GLfloat width, GLfloat height, GLfloat angle);

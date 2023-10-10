@@ -1,5 +1,6 @@
 #include <iostream>
 #include <GL/glut.h>
+#include <list>
 
 #include "tinyxml2/tinyxml2.hpp"
 #include "include/arena.h"
@@ -22,8 +23,10 @@ Shooter gPlayer;
 GLfloat gPlayerHeadRadius;
 GLfloat gPlayerSpeed;
 
-Shot* shot = nullptr;
-GLfloat gShotRadius = 10, gShotSpeed = 50;
+list<Shot*> shots;
+GLfloat gShotRadius;
+GLfloat gShotSpeed;
+GLfloat gShotMaxDistance;
 
 void init() {
     glClearColor(0.0, 0.0, 0.0, 1.0);
@@ -41,24 +44,43 @@ void movePlayer(GLdouble dt) {
     GLfloat dx = 0, dy = 0, wallDistance = 0, inc = (gPlayerSpeed * dt);
     if(keyStatus[(int)('a')]) {
         wallDistance = abs(aLeftBottom.x - pLeftBottom.x);
-        dx -= (pLeftBottom.x - inc > aLeftBottom.x) ? inc : wallDistance;
+        dx -= min(inc, wallDistance);
     }
 
     if(keyStatus[(int)('d')]) {
         wallDistance = abs(aRightTop.x - pRightTop.x);
-        dx += (pRightTop.x + inc < aRightTop.x) ? inc : wallDistance;
+        dx += min(inc, wallDistance);
     }
 
     if(keyStatus[(int)('s')]) {
         wallDistance = abs(aLeftBottom.y - pLeftBottom.y);
-        dy -= (pLeftBottom.y - inc > aLeftBottom.y) ? inc : wallDistance;
+        dy -= min(inc, wallDistance);
     }
 
     if(keyStatus[(int)('w')]) {
         wallDistance = abs(aRightTop.y - pRightTop.y);
-        dy += (pRightTop.y + inc < aRightTop.y) ? inc : wallDistance;
+        dy += min(inc, wallDistance);
     }
     gPlayer.move(dx, dy);
+}
+
+void moveShot(GLdouble dt) {
+    for (auto shot : shots) {
+        shot->move(dt);
+
+        //Trata colisao
+        // if (alvo.Atingido(tiro)){
+        //     alvo.Recria(rand()%500 - 250, 200);
+        // }
+    }
+
+    shots.remove_if([](Shot* shot) {
+        bool isValid = shot->isValid();
+        if (!isValid) {
+            delete shot;
+        }
+        return !isValid;
+    });
 }
 
 void idle() {
@@ -69,20 +91,7 @@ void idle() {
     previousTime = currentTime;
 
     movePlayer(timeDiference);
-
-    if(shot){
-        shot->move();
-
-        //Trata colisao
-        // if (alvo.Atingido(tiro)){
-        //     alvo.Recria(rand()%500 - 250, 200);
-        // }
-
-        if (!shot->isValid()){ 
-            delete shot;
-            shot = NULL;
-        }
-    }
+    moveShot(timeDiference);
 
     glutPostRedisplay();
 }
@@ -93,7 +102,9 @@ void display() {
     gArena.draw();
     gPlayer.draw();
 
-    if (shot) shot->draw();
+    for (auto shot : shots) {
+        shot->draw();
+    }
 
     glutSwapBuffers();
 }
@@ -121,8 +132,8 @@ void mouseMotion(int x, int y) {
 }
 
 void mouseClick(int button, int state, int x, int y) {
-    if (button == 0 && state == 0 && shot == nullptr) {
-        shot = gPlayer.shoot();
+    if (button == 0 && state == 0) {
+        shots.push_back(gPlayer.shoot());
     }
 }
 
@@ -147,12 +158,16 @@ void loadConfiguration() {
     gPlayerHeadRadius = stof(jogador->Attribute("raioCabeca"));
     gPlayerSpeed = stof(jogador->Attribute("velocidade"));
 
+    XMLElement* tiro = rootElement->FirstChildElement("tiro");
+    gShotRadius = stof(tiro->Attribute("raio"));
+    gShotSpeed = stof(tiro->Attribute("velocidade"));
+
     // XMLElement* inimigo = rootElement->FirstChildElement("inimigo");
     // XMLElement* barril = rootElement->FirstChildElement("barril");
-    // XMLElement* tiro = rootElement->FirstChildElement("tiro");
 
     gArena = Arena(gWidth, gHeight);
     gPlayer = Shooter(0.0, -gHeight/4., gPlayerHeadRadius, {0, 1, 0});
+    gShotMaxDistance = max(gWidth, gHeight);
 
     // auto [p1, p2] = gArena.getBoundaries();
     // cout << "p1.x: " << p1.x << " p1.y: " << p1.y << "\n";

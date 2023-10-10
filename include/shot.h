@@ -17,7 +17,7 @@ public:
     };
 
     void draw();
-    void move();
+    void move(GLdouble dt);
     Point getPosition();
     bool isValid();
 };

@@ -3,5 +3,5 @@
     <jogador raioCabeca="35" velocidade="0.2"/>
     <inimigo raioCabeca="50" tirosPorSegundo="1"/>
     <barril altura="100" largura="200" numeroTiros="5" nParaGanhar="10" velocidade="1"/>
-    <tiro raio="5" velocidade="1"/>
+    <tiro raio="10" velocidade="1"/>
 </jogo>

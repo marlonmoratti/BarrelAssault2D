@@ -3,6 +3,16 @@
 #include "../include/shooter.h"
 #include "../include/shape.h"
 
+tuple<GLfloat, GLfloat> Shooter::getFootDimensions() {
+    GLfloat width = headRadius/2, height = 2*headRadius;
+    return { width, height };
+}
+
+tuple<GLfloat, GLfloat> Shooter::getGunDimensions() {
+    GLfloat width = 2*headRadius/3., height = 4*headRadius;
+    return { width, height };
+}
+
 void Shooter::drawBody(GLfloat x, GLfloat y, GLfloat radius) {
     glPushMatrix();
         glTranslatef(x, y, 0);
@@ -27,13 +37,13 @@ void Shooter::drawGun(GLfloat x, GLfloat y, GLfloat width, GLfloat height, GLflo
 }
 
 void Shooter::draw() {
-    GLfloat footWidth = headRadius/2, footHeight = 2*headRadius;
+    auto [footWidth, footHeight] = getFootDimensions();
     drawFoot(x - (headRadius - footWidth), y, footWidth, -footHeight, -footAngle);
     drawFoot(x + (headRadius - footWidth), y, footWidth, footHeight, footAngle);
 
     drawBody(x, y, headRadius);
 
-    GLfloat gunWidth = 2*headRadius/3., gunHeight = 4*headRadius;
+    auto [gunWidth, gunHeight] = getGunDimensions();
     drawGun(x + (headRadius + gunWidth/2.), y - headRadius, gunWidth, gunHeight, aimingAngle);
 }
 
@@ -58,7 +68,7 @@ tuple<Point, Point> Shooter::getHitBox() {
 
 Shot* Shooter::shoot() {
     Point p1, p2;
-    GLfloat gunWidth = 2*headRadius/3., gunHeight = 4*headRadius;
+    auto [gunWidth, gunHeight] = getGunDimensions();
 
     p2.translate(0, gunHeight);
     p2.rotate(aimingAngle);
@@ -67,9 +77,9 @@ Shot* Shooter::shoot() {
     p1.rotate(aimingAngle);
     p1.translate(x + (headRadius + gunWidth/2.), y - headRadius);
 
-    GLfloat x0 = p2.x - p1.x, y0 = p2.y - p1.y,
-        norm = sqrt(pow(x0, 2) + pow(y0, 2));
-    x0 /= norm; y0 /= norm;
+    GLfloat xv = p2.x - p1.x, yv = p2.y - p1.y,
+        norm = sqrt(pow(xv, 2) + pow(yv, 2));
+    xv /= norm; yv /= norm;
 
-    return new Shot(p2.x, p2.y, atan2(y0, x0));
+    return new Shot(p2.x, p2.y, atan2(yv, xv));
 }
