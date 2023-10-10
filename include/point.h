@@ -2,6 +2,8 @@
 #define	POINT_H
 
 #include <GL/gl.h>
+#include <GL/glu.h>
+#include <GL/glut.h>
 
 class Point {
 public:

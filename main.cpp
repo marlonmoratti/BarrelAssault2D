@@ -1,4 +1,7 @@
 #include <iostream>
+#include <cctype>
+#include <GL/gl.h>
+#include <GL/glu.h>
 #include <GL/glut.h>
 #include <list>
 
@@ -6,6 +9,7 @@
 #include "include/arena.h"
 #include "include/shooter.h"
 #include "include/shot.h"
+#include "include/barrel.h"
 
 using namespace std;
 using namespace tinyxml2;
@@ -27,6 +31,9 @@ list<Shot*> shots;
 GLfloat gShotRadius;
 GLfloat gShotSpeed;
 GLfloat gShotMaxDistance;
+
+GLfloat gBarrelWidth = 200, gBarrelHeight = 100, gBarrelSpeed = 1, gEnemyHeadRadius = 30;
+Barrel barrel(0.0, 350.0, 5, false);
 
 void init() {
     glClearColor(0.0, 0.0, 0.0, 1.0);
@@ -106,16 +113,18 @@ void display() {
         shot->draw();
     }
 
+    barrel.draw();
+
     glutSwapBuffers();
 }
 
 void keyDown(unsigned char key, int x, int y) {
-    keyStatus[(int)(key)] = 1;
+    keyStatus[tolower(key)] = 1;
     glutPostRedisplay();
 }
 
 void keyUp(unsigned char key, int x, int y) {
-    keyStatus[(int)(key)] = 0;
+    keyStatus[tolower(key)] = 0;
     glutPostRedisplay();
 }
 
@@ -168,10 +177,6 @@ void loadConfiguration() {
     gArena = Arena(gWidth, gHeight);
     gPlayer = Shooter(0.0, -gHeight/4., gPlayerHeadRadius, {0, 1, 0});
     gShotMaxDistance = max(gWidth, gHeight);
-
-    // auto [p1, p2] = gArena.getBoundaries();
-    // cout << "p1.x: " << p1.x << " p1.y: " << p1.y << "\n";
-    // cout << "p2.x: " << p2.x << " p2.y: " << p2.y << "\n";
 }
 
 int main(int argc, char *argv[]) {

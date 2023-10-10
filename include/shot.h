@@ -1,6 +1,8 @@
 #ifndef SHOT_H
 #define SHOT_H
 
+#include <GL/gl.h>
+#include <GL/glu.h>
 #include <GL/glut.h>
 
 #include "point.h"
