@@ -3,6 +3,7 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <GL/glut.h>
+#include <math.h>
 #include <list>
 
 #include "tinyxml2/tinyxml2.hpp"
@@ -27,13 +28,16 @@ Shooter gPlayer;
 GLfloat gPlayerHeadRadius;
 GLfloat gPlayerSpeed;
 
-list<Shot*> shots;
+list<Shot*> gShots;
 GLfloat gShotRadius;
 GLfloat gShotSpeed;
 GLfloat gShotMaxDistance;
 
-GLfloat gBarrelWidth = 200, gBarrelHeight = 100, gBarrelSpeed = 1, gEnemyHeadRadius = 30;
-Barrel barrel(0.0, 350.0, 5, false);
+list<Barrel*> gBarrels;
+GLfloat gBarrelWidth;
+GLfloat gBarrelHeight;
+GLfloat gBarrelSpeed;
+GLfloat gEnemyHeadRadius;
 
 void init() {
     glClearColor(0.0, 0.0, 0.0, 1.0);
@@ -72,22 +76,43 @@ void movePlayer(GLdouble dt) {
 }
 
 void moveShot(GLdouble dt) {
-    for (auto shot : shots) {
+    for (auto shot : gShots) {
         shot->move(dt);
+        Point p = shot->getPosition();
 
-        //Trata colisao
-        // if (alvo.Atingido(tiro)){
-        //     alvo.Recria(rand()%500 - 250, 200);
-        // }
+        gBarrels.remove_if([shot, p](auto barrel) {
+            if (barrel->isHit(p.x, p.y)) {
+
+                shot->setHit();
+
+                if (barrel->decreaseLife()) {
+                    delete barrel;
+                    return true;
+                }
+            }
+
+            return false;
+        });
     }
 
-    shots.remove_if([](Shot* shot) {
+    gShots.remove_if([](auto shot) {
         bool isValid = shot->isValid();
         if (!isValid) {
             delete shot;
         }
         return !isValid;
     });
+}
+
+void moveBarrel(GLdouble dt) {
+    for (auto barrel : gBarrels) {
+        barrel->move(dt);
+
+        if (auto enemy = barrel->getEnemy()) {
+            Point playerPosition = gPlayer.getPosition();
+            enemy->setAimingAngleTo(playerPosition.x, playerPosition.y);
+        }
+    }
 }
 
 void idle() {
@@ -99,6 +124,7 @@ void idle() {
 
     movePlayer(timeDiference);
     moveShot(timeDiference);
+    moveBarrel(timeDiference);
 
     glutPostRedisplay();
 }
@@ -109,11 +135,13 @@ void display() {
     gArena.draw();
     gPlayer.draw();
 
-    for (auto shot : shots) {
+    for (auto shot : gShots) {
         shot->draw();
     }
 
-    barrel.draw();
+    for (auto barrel : gBarrels) {
+        barrel->draw();
+    }
 
     glutSwapBuffers();
 }
@@ -142,7 +170,7 @@ void mouseMotion(int x, int y) {
 
 void mouseClick(int button, int state, int x, int y) {
     if (button == 0 && state == 0) {
-        shots.push_back(gPlayer.shoot());
+        gShots.push_back(gPlayer.shoot());
     }
 }
 
@@ -171,12 +199,19 @@ void loadConfiguration() {
     gShotRadius = stof(tiro->Attribute("raio"));
     gShotSpeed = stof(tiro->Attribute("velocidade"));
 
-    // XMLElement* inimigo = rootElement->FirstChildElement("inimigo");
-    // XMLElement* barril = rootElement->FirstChildElement("barril");
+    XMLElement* barril = rootElement->FirstChildElement("barril");
+    gBarrelWidth = stof(barril->Attribute("largura"));
+    gBarrelHeight = stof(barril->Attribute("altura"));
+    gBarrelSpeed = stof(barril->Attribute("velocidade"));
+
+    XMLElement* inimigo = rootElement->FirstChildElement("inimigo");
+    gEnemyHeadRadius = stof(inimigo->Attribute("raioCabeca"));
 
     gArena = Arena(gWidth, gHeight);
     gPlayer = Shooter(0.0, -gHeight/4., gPlayerHeadRadius, {0, 1, 0});
     gShotMaxDistance = max(gWidth, gHeight);
+
+    gBarrels.push_back(new Barrel(0, gHeight/4., 5, true));
 }
 
 int main(int argc, char *argv[]) {

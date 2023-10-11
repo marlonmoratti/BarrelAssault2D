@@ -17,10 +17,14 @@ void Shot::move(GLdouble dt) {
     y += (speed * sin(angle)) * dt;
 }
 
+void Shot::setHit() {
+    hitTarget = true;
+}
+
 Point Shot::getPosition() {
     return Point(x, y);
 }
 
 bool Shot::isValid() {
-    return sqrt(pow(x - x0, 2) + pow(y - y0, 2)) < gShotMaxDistance;
+    return !hitTarget && sqrt(pow(x - x0, 2) + pow(y - y0, 2)) < gShotMaxDistance;
 }

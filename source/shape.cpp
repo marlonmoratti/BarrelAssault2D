@@ -35,9 +35,10 @@ void Shape::drawLine(Point p1, Point p2, GLfloat lw, tuple<GLfloat, GLfloat, GLf
     auto [R, G, B] = color;
     glColor3f(R, G, B);
 
-    glLineWidth(lw);
-    glBegin(GL_LINES);
-        glVertex2f(p1.x, p1.y);
-        glVertex2f(p2.x, p2.y);
+    glBegin(GL_POLYGON);
+        glVertex2f(p1.x, p1.y - (lw/2.));
+        glVertex2f(p2.x, p2.y - (lw/2.));
+        glVertex2f(p2.x, p2.y + (lw/2.));
+        glVertex2f(p1.x, p1.y + (lw/2.));
     glEnd();
 }

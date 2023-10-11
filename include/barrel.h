@@ -10,28 +10,31 @@
 extern GLfloat gBarrelWidth, gBarrelHeight, gBarrelSpeed, gEnemyHeadRadius;
 
 class Barrel {
-    GLfloat x, y, width, height, lives, speed;
+    GLfloat x, y, width, height, speed;
+    GLint lives;
     Shooter* shooter = nullptr;
 
     void drawBarrel(GLfloat x, GLfloat y, GLfloat width, GLfloat height);
     void drawLives(GLfloat x, GLfloat y, GLfloat scale);
-    void drawShooter(GLfloat x, GLfloat y);
+    void drawShooter();
 public:
-    Barrel(GLfloat x, GLfloat y, GLint lives, bool enemy) : x(x), y(y), lives(lives) {
+    Barrel(GLfloat x=0, GLfloat y=0, GLint lives=0, bool withEnemy=false) : x(x), y(y), lives(lives) {
         width = gBarrelWidth;
         height = gBarrelHeight;
         speed = gBarrelSpeed;
 
-        if (enemy) shooter = new Shooter(
-            x - width/6.,
-            y + height/2.,
-            gEnemyHeadRadius
+        if (withEnemy) shooter = new Shooter(
+            x - width/10., y + height/2., gEnemyHeadRadius, {0.5, 0, 1}, withEnemy
         );
     };
 
     ~Barrel() { if (shooter) delete shooter; };
 
     void draw();
+    void move(GLdouble dt);
+    Shooter* getEnemy();
+    bool isHit(GLfloat x, GLfloat y);
+    bool decreaseLife(); // returns true if the barrel is destroyed
 };
 
 #endif

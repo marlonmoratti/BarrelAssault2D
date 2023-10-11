@@ -9,8 +9,8 @@ void Point::translate(GLfloat dx, GLfloat dy) {
 void Point::rotate(GLfloat angle) {
     angle *= (M_PI/180); // degrees to radians
 
-    GLfloat xHat = x*cos(angle) - y*sin(angle),
-            yHat = x*sin(angle) + y*cos(angle);
+    GLfloat x = this->x*cos(angle) - this->y*sin(angle),
+            y = this->x*sin(angle) + this->y*cos(angle);
 
-    x = xHat; y = yHat;
+    this->x = x; this->y = y;
 }

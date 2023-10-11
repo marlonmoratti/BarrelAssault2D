@@ -1,7 +1,10 @@
 #include <math.h>
+#include <algorithm>
 
 #include "../include/shooter.h"
 #include "../include/shape.h"
+
+using namespace std;
 
 tuple<GLfloat, GLfloat> Shooter::getFootDimensions() {
     GLfloat width = headRadius/2, height = 2*headRadius;
@@ -36,15 +39,29 @@ void Shooter::drawGun(GLfloat x, GLfloat y, GLfloat width, GLfloat height, GLflo
     glPopMatrix();
 }
 
-void Shooter::draw() {
-    auto [footWidth, footHeight] = getFootDimensions();
-    drawFoot(x - (headRadius - footWidth), y, footWidth, -footHeight, -footAngle);
-    drawFoot(x + (headRadius - footWidth), y, footWidth, footHeight, footAngle);
-
-    drawBody(x, y, headRadius);
-
+Point Shooter::getGunAxisPoint() {
     auto [gunWidth, gunHeight] = getGunDimensions();
-    drawGun(x + (headRadius + gunWidth/2.), y - headRadius, gunWidth, gunHeight, aimingAngle);
+    return Point(x + (headRadius + gunWidth/2.), y - headRadius);
+}
+
+void Shooter::draw() {
+    glPushMatrix();
+        if (isEnemy) {
+            glTranslatef(x, y, 0);
+            glRotatef(180, 0, 0, 1);
+            glTranslatef(-x, -y, 0);
+        }
+
+        auto [footWidth, footHeight] = getFootDimensions();
+        drawFoot(x - (headRadius - footWidth), y, footWidth, -footHeight, -footAngle);
+        drawFoot(x + (headRadius - footWidth), y, footWidth, footHeight, footAngle);
+
+        drawBody(x, y, headRadius);
+
+        auto [gunWidth, gunHeight] = getGunDimensions();
+        Point gunAxisPoint = getGunAxisPoint();
+        drawGun(gunAxisPoint.x, gunAxisPoint.y, gunWidth, gunHeight, aimingAngle);
+    glPopMatrix();
 }
 
 void Shooter::move(GLfloat dx, GLfloat dy) {
@@ -53,10 +70,32 @@ void Shooter::move(GLfloat dx, GLfloat dy) {
 }
 
 void Shooter::adjustAimingAngle(GLfloat dt) {
-    GLfloat angle = aimingAngle + dt;
+    GLfloat angle = aimingAngle + ((isEnemy) ? -dt : dt);
     if (abs(angle) <= 30) {
         aimingAngle = angle;
     }
+}
+
+void Shooter::setAimingAngleTo(GLfloat x, GLfloat y) {
+    Point p = getGunAxisPoint();
+    if (isEnemy) {
+        p.translate(-this->x, -this->y);
+        p.rotate(180);
+        p.translate(this->x, this->y);
+    }
+
+    GLfloat xv = x - p.x, yv = y - p.y, norm = sqrt(pow(xv, 2) + pow(yv, 2));
+
+    if (!norm) return;
+
+    xv /= norm; yv /= norm;
+
+    GLfloat angle = -(atan2(yv, xv) * 180/M_PI) - 90;
+    this->aimingAngle = -clamp((double) angle, -30., 30.);
+}
+
+Point Shooter::getPosition() {
+    return Point(x, y);
 }
 
 tuple<Point, Point> Shooter::getHitBox() {
@@ -76,6 +115,16 @@ Shot* Shooter::shoot() {
 
     p1.rotate(aimingAngle);
     p1.translate(x + (headRadius + gunWidth/2.), y - headRadius);
+
+    if (isEnemy) {
+        p2.translate(-x, -y);
+        p2.rotate(180);
+        p2.translate(x, y);
+
+        p1.translate(-x, -y);
+        p1.rotate(180);
+        p1.translate(x, y);
+    }
 
     GLfloat xv = p2.x - p1.x, yv = p2.y - p1.y,
         norm = sqrt(pow(xv, 2) + pow(yv, 2));
