@@ -15,6 +15,7 @@ public:
     static void drawRectangle(GLfloat width, GLfloat height, tuple<GLfloat, GLfloat, GLfloat> color);
     static void drawCircle(GLfloat radius, tuple<GLfloat, GLfloat, GLfloat> color);
     static void drawLine(Point p1, Point p2, GLfloat lw, tuple<GLfloat, GLfloat, GLfloat> color);
+    static void drawText(char* str, GLfloat lw, tuple<GLfloat, GLfloat, GLfloat> color);
 };
 
 #endif

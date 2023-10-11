@@ -144,7 +144,7 @@ void idle() {
     moveShot(timeDiference);
     moveBarrel(timeDiference);
 
-    spawnBarrel(timeDiference);
+    // spawnBarrel(timeDiference);
 
     glutPostRedisplay();
 }
@@ -231,6 +231,8 @@ void loadConfiguration() {
     gArena = Arena(gWidth, gHeight);
     gPlayer = Shooter(0.0, -gHeight/4., gPlayerHeadRadius, {0, 1, 0});
     gShotMaxDistance = max(gWidth, gHeight);
+
+    gBarrels.push_back(new Barrel(0, gHeight/4., gBarrelLives, true));
 }
 
 int main(int argc, char *argv[]) {

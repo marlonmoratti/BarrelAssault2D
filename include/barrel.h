@@ -15,8 +15,7 @@ class Barrel {
     Shooter* shooter = nullptr;
 
     void drawBarrel(GLfloat x, GLfloat y, GLfloat width, GLfloat height);
-    void drawLives(GLfloat x, GLfloat y, GLfloat scale);
-    void drawShooter();
+    void drawLives(GLfloat x, GLfloat y, GLfloat scale, GLfloat lw);
 public:
     Barrel(GLfloat x=0, GLfloat y=0, GLint lives=0, bool withEnemy=false) : x(x), y(y), lives(lives) {
         width = gBarrelWidth;

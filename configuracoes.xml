@@ -2,6 +2,6 @@
     <arena altura="700" largura="500"/>
     <jogador raioCabeca="30" velocidade="0.2"/>
     <inimigo raioCabeca="30" tirosPorSegundo="1"/>
-    <barril altura="75" largura="150" numeroTiros="5" nParaGanhar="10" velocidade="0.05"/>
+    <barril altura="75" largura="150" numeroTiros="5" nParaGanhar="10" velocidade="0.005"/>
     <tiro raio="7" velocidade="1"/>
 </jogo>

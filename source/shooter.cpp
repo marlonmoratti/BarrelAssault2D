@@ -91,7 +91,7 @@ void Shooter::setAimingAngleTo(GLfloat x, GLfloat y) {
     xv /= norm; yv /= norm;
 
     GLfloat angle = -(atan2(yv, xv) * 180/M_PI) - 90;
-    this->aimingAngle = -clamp((double) angle, -30., 30.);
+    this->aimingAngle = (abs(angle) > 90) ? 0 : -clamp((double) angle, -30., 30.);
 }
 
 Point Shooter::getPosition() {

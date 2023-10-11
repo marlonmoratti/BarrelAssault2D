@@ -10,27 +10,21 @@ void Barrel::drawBarrel(GLfloat x, GLfloat y, GLfloat width, GLfloat height) {
     glPopMatrix();
 }
 
-void Barrel::drawLives(GLfloat x, GLfloat y, GLfloat scale) {
+void Barrel::drawLives(GLfloat x, GLfloat y, GLfloat scale, GLfloat lw) {
     static char str[100];
-    glColor3f(0.0, 0.0, 0.0);
     sprintf(str, "%d", lives);
-
-    glLineWidth(3);
 
     glPushMatrix();
         glTranslatef(x, y, 0);
-        glScalef(0.25, 0.25, 1.0);
-
-        for (int i = 0; str[i]; i++) {
-            glutStrokeCharacter(GLUT_STROKE_ROMAN , str[i]);
-        }
+        glScalef(scale, scale, 1.0);
+        Shape::drawText(str, lw, {0, 0, 0});
     glPopMatrix();
 
 }
 
 void Barrel::draw() {
     drawBarrel(x, y, width, height);
-    drawLives(x + width/4., y + height/3., 0);
+    drawLives(x + width/4., y + height/3., height/75. * 0.25, height/75. * 3);
     if (shooter) shooter->draw();
 };
 

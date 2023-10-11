@@ -18,7 +18,7 @@ void Shape::drawCircle(GLfloat radius, tuple<GLfloat, GLfloat, GLfloat> color) {
     glColor3f(R, G, B);
 
     glPushMatrix();
-        GLfloat angleBetweenPoints = 10;
+        GLfloat angleBetweenPoints = 1;
         GLint nPoints = 360 / angleBetweenPoints;
         Point p(radius, 0);
 
@@ -41,4 +41,14 @@ void Shape::drawLine(Point p1, Point p2, GLfloat lw, tuple<GLfloat, GLfloat, GLf
         glVertex2f(p2.x, p2.y + (lw/2.));
         glVertex2f(p1.x, p1.y + (lw/2.));
     glEnd();
+}
+
+void Shape::drawText(char* str, GLfloat lw, tuple<GLfloat, GLfloat, GLfloat> color) {
+    auto [R, G, B] = color;
+    glColor3f(R, G, B);
+    glLineWidth(lw);
+
+    for (int i = 0; str[i]; i++) {
+        glutStrokeCharacter(GLUT_STROKE_ROMAN , str[i]);
+    }
 }
