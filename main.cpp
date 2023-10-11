@@ -4,6 +4,7 @@
 #include <GL/glu.h>
 #include <GL/glut.h>
 #include <math.h>
+#include <stdlib.h>
 #include <list>
 
 #include "tinyxml2/tinyxml2.hpp"
@@ -37,6 +38,7 @@ list<Barrel*> gBarrels;
 GLfloat gBarrelWidth;
 GLfloat gBarrelHeight;
 GLfloat gBarrelSpeed;
+GLint gBarrelLives;
 GLfloat gEnemyHeadRadius;
 
 void init() {
@@ -115,6 +117,22 @@ void moveBarrel(GLdouble dt) {
     }
 }
 
+void spawnBarrel(GLdouble dt) {
+    static GLfloat minDistance = 10, distance = 0;
+
+    distance += gBarrelSpeed * dt;
+    if (!gBarrels.empty() && distance < (gBarrelHeight + minDistance)) return;
+
+    GLfloat x = (rand() % ((int) (gWidth - gBarrelWidth)/2)) * (-1 * (rand() % 2));
+    GLfloat y = gHeight/2. - gBarrelHeight;
+
+    gBarrels.push_back(
+        new Barrel(x, y, gBarrelLives, (rand() % 2))
+    );
+
+    distance = 0;
+}
+
 void idle() {
     static GLdouble previousTime = glutGet(GLUT_ELAPSED_TIME);
     GLdouble currentTime, timeDiference;
@@ -125,6 +143,8 @@ void idle() {
     movePlayer(timeDiference);
     moveShot(timeDiference);
     moveBarrel(timeDiference);
+
+    spawnBarrel(timeDiference);
 
     glutPostRedisplay();
 }
@@ -203,6 +223,7 @@ void loadConfiguration() {
     gBarrelWidth = stof(barril->Attribute("largura"));
     gBarrelHeight = stof(barril->Attribute("altura"));
     gBarrelSpeed = stof(barril->Attribute("velocidade"));
+    gBarrelLives = stoi(barril->Attribute("numeroTiros"));
 
     XMLElement* inimigo = rootElement->FirstChildElement("inimigo");
     gEnemyHeadRadius = stof(inimigo->Attribute("raioCabeca"));
@@ -210,11 +231,11 @@ void loadConfiguration() {
     gArena = Arena(gWidth, gHeight);
     gPlayer = Shooter(0.0, -gHeight/4., gPlayerHeadRadius, {0, 1, 0});
     gShotMaxDistance = max(gWidth, gHeight);
-
-    gBarrels.push_back(new Barrel(0, gHeight/4., 5, true));
 }
 
 int main(int argc, char *argv[]) {
+    srand(0);
+
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
 

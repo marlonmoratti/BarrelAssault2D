@@ -31,7 +31,7 @@ void Barrel::drawLives(GLfloat x, GLfloat y, GLfloat scale) {
 void Barrel::draw() {
     drawBarrel(x, y, width, height);
     drawLives(x + width/4., y + height/3., 0);
-    shooter->draw();
+    if (shooter) shooter->draw();
 };
 
 void Barrel::move(GLdouble dt) {
