@@ -30,8 +30,9 @@ public:
     void move(GLfloat dx, GLfloat dy);
     void adjustAimingAngle(GLfloat dt);
     void setAimingAngleTo(GLfloat x, GLfloat y);
-    Point getPosition();
+    tuple<Point, GLfloat> getDimensions();
     tuple<Point, Point> getHitBox();
+    bool checkCollision(tuple<Point, GLfloat> circle);
     Shot* shoot();
 };
 

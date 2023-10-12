@@ -17,14 +17,15 @@ void Shot::move(GLdouble dt) {
     y += (speed * sin(angle)) * dt;
 }
 
-void Shot::setHit() {
-    hitTarget = true;
+void Shot::setCollision() {
+    collision = true;
 }
 
-Point Shot::getPosition() {
-    return Point(x, y);
+tuple<Point, GLfloat> Shot::getDimensions() {
+    Point center(x, y);
+    return { center, radius };
 }
 
 bool Shot::isValid() {
-    return !hitTarget && sqrt(pow(x - x0, 2) + pow(y - y0, 2)) < gShotMaxDistance;
+    return !collision && sqrt(pow(x - x0, 2) + pow(y - y0, 2)) < gShotMaxDistance;
 }

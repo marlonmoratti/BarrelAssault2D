@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <math.h>
 
 #include "../include/barrel.h"
 #include "../include/shape.h"
@@ -37,12 +38,23 @@ Shooter* Barrel::getEnemy() {
     return shooter;
 }
 
-bool Barrel::isHit(GLfloat x, GLfloat y) {
-    Point leftBottom(this->x - width/2., this->y), rightTop(this->x + width/2., this->y + height);
-    return x >= leftBottom.x
-        && x <= rightTop.x
-        && y >= leftBottom.y
-        && y <= rightTop.y;
+bool Barrel::checkCollision(tuple<Point, GLfloat> circle) {
+    Point barrelCenter = Point(x, y + height/2.),
+          barrelLeftBottom = Point(x - width/2., y),
+          barrelRightTop = Point(x + width/2., y + height);
+
+    auto [circleCenter, circleRadius] = circle;
+
+    GLfloat nearestX = max(barrelLeftBottom.x, min(circleCenter.x, barrelRightTop.x)),
+            nearestY = max(barrelLeftBottom.y, min(circleCenter.y, barrelRightTop.y));
+    GLfloat distance = sqrt(pow(nearestX - circleCenter.x, 2) + pow(nearestY - circleCenter.y, 2));
+
+    // return circleCenter.x >= barrelLeftBottom.x
+    //     && circleCenter.x <= barrelRightTop.x
+    //     && circleCenter.y >= barrelLeftBottom.y
+    //     && circleCenter.y <= barrelRightTop.y;
+
+    return distance <= circleRadius;
 }
 
 bool Barrel::decreaseLife() {

@@ -12,6 +12,7 @@
 #include "include/shooter.h"
 #include "include/shot.h"
 #include "include/barrel.h"
+#include "include/game.h"
 
 using namespace std;
 using namespace tinyxml2;
@@ -40,88 +41,15 @@ GLfloat gBarrelHeight;
 GLfloat gBarrelSpeed;
 GLint gBarrelLives;
 GLfloat gEnemyHeadRadius;
+GLfloat gDistanceBetweenBarrels;
 
-void init() {
-    glClearColor(0.0, 0.0, 0.0, 1.0);
-
-    glMatrixMode(GL_PROJECTION);
-    glOrtho(-(gWidth/2), (gWidth/2), -(gHeight/2), (gHeight/2), -100, 100);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-}
-
-void movePlayer(GLdouble dt) {
-    auto [pLeftBottom, pRightTop] = gPlayer.getHitBox();
-    auto [aLeftBottom, aRightTop] = gArena.getBoundaries();
-
-    GLfloat dx = 0, dy = 0, wallDistance = 0, inc = (gPlayerSpeed * dt);
-    if(keyStatus[(int)('a')]) {
-        wallDistance = abs(aLeftBottom.x - pLeftBottom.x);
-        dx -= min(inc, wallDistance);
-    }
-
-    if(keyStatus[(int)('d')]) {
-        wallDistance = abs(aRightTop.x - pRightTop.x);
-        dx += min(inc, wallDistance);
-    }
-
-    if(keyStatus[(int)('s')]) {
-        wallDistance = abs(aLeftBottom.y - pLeftBottom.y);
-        dy -= min(inc, wallDistance);
-    }
-
-    if(keyStatus[(int)('w')]) {
-        wallDistance = abs(aRightTop.y - pRightTop.y);
-        dy += min(inc, wallDistance);
-    }
-    gPlayer.move(dx, dy);
-}
-
-void moveShot(GLdouble dt) {
-    for (auto shot : gShots) {
-        shot->move(dt);
-        Point p = shot->getPosition();
-
-        gBarrels.remove_if([shot, p](auto barrel) {
-            if (barrel->isHit(p.x, p.y)) {
-
-                shot->setHit();
-
-                if (barrel->decreaseLife()) {
-                    delete barrel;
-                    return true;
-                }
-            }
-
-            return false;
-        });
-    }
-
-    gShots.remove_if([](auto shot) {
-        bool isValid = shot->isValid();
-        if (!isValid) {
-            delete shot;
-        }
-        return !isValid;
-    });
-}
-
-void moveBarrel(GLdouble dt) {
-    for (auto barrel : gBarrels) {
-        barrel->move(dt);
-
-        if (auto enemy = barrel->getEnemy()) {
-            Point playerPosition = gPlayer.getPosition();
-            enemy->setAimingAngleTo(playerPosition.x, playerPosition.y);
-        }
-    }
-}
+Game *gGame = nullptr;
 
 void spawnBarrel(GLdouble dt) {
-    static GLfloat minDistance = 10, distance = 0;
+    static GLfloat distance = 0;
 
     distance += gBarrelSpeed * dt;
-    if (!gBarrels.empty() && distance < (gBarrelHeight + minDistance)) return;
+    if (!gBarrels.empty() && distance < (gBarrelHeight + gDistanceBetweenBarrels)) return;
 
     GLfloat x = (rand() % ((int) (gWidth - gBarrelWidth)/2)) * (-1 * (rand() % 2));
     GLfloat y = gHeight/2. - gBarrelHeight;
@@ -133,6 +61,15 @@ void spawnBarrel(GLdouble dt) {
     distance = 0;
 }
 
+void init() {
+    glClearColor(0.0, 0.0, 0.0, 1.0);
+
+    glMatrixMode(GL_PROJECTION);
+    glOrtho(-(gWidth/2), (gWidth/2), -(gHeight/2), (gHeight/2), -100, 100);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+}
+
 void idle() {
     static GLdouble previousTime = glutGet(GLUT_ELAPSED_TIME);
     GLdouble currentTime, timeDiference;
@@ -140,11 +77,11 @@ void idle() {
     timeDiference = currentTime - previousTime;
     previousTime = currentTime;
 
-    movePlayer(timeDiference);
-    moveShot(timeDiference);
-    moveBarrel(timeDiference);
+    gGame->movePlayer(gPlayerSpeed * timeDiference);
+    gGame->moveShot(timeDiference);
+    gGame->moveBarrel(timeDiference);
 
-    // spawnBarrel(timeDiference);
+    spawnBarrel(timeDiference);
 
     glutPostRedisplay();
 }
@@ -152,8 +89,21 @@ void idle() {
 void display() {
     glClear(GL_COLOR_BUFFER_BIT);
 
-    gArena.draw();
-    gPlayer.draw();
+    if (gGame->isDefeat()) {
+
+
+        glutSwapBuffers();
+        return;
+    }
+
+    if (gGame->isVictory()) {
+
+
+        glutSwapBuffers();
+        return;
+    }
+
+    gArena.draw(); gPlayer.draw();
 
     for (auto shot : gShots) {
         shot->draw();
@@ -224,6 +174,7 @@ void loadConfiguration() {
     gBarrelHeight = stof(barril->Attribute("altura"));
     gBarrelSpeed = stof(barril->Attribute("velocidade"));
     gBarrelLives = stoi(barril->Attribute("numeroTiros"));
+    gDistanceBetweenBarrels = stof(barril->Attribute("distanciaEntre"));
 
     XMLElement* inimigo = rootElement->FirstChildElement("inimigo");
     gEnemyHeadRadius = stof(inimigo->Attribute("raioCabeca"));
@@ -232,7 +183,9 @@ void loadConfiguration() {
     gPlayer = Shooter(0.0, -gHeight/4., gPlayerHeadRadius, {0, 1, 0});
     gShotMaxDistance = max(gWidth, gHeight);
 
-    gBarrels.push_back(new Barrel(0, gHeight/4., gBarrelLives, true));
+    // gBarrels.push_back(new Barrel(0, gHeight/4., gBarrelLives, true));
+
+    gGame = new Game(gArena, gPlayer, keyStatus, gShots, gBarrels);
 }
 
 int main(int argc, char *argv[]) {
@@ -259,6 +212,8 @@ int main(int argc, char *argv[]) {
 
     init();
 
-    glutMainLoop();    
+    glutMainLoop();
+
+    delete gGame;
     return 0;
 }

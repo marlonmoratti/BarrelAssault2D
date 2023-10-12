@@ -4,8 +4,11 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <GL/glut.h>
+#include <tuple>
 
 #include "shooter.h"
+
+using namespace std;
 
 extern GLfloat gBarrelWidth, gBarrelHeight, gBarrelSpeed, gEnemyHeadRadius;
 
@@ -32,7 +35,7 @@ public:
     void draw();
     void move(GLdouble dt);
     Shooter* getEnemy();
-    bool isHit(GLfloat x, GLfloat y);
+    bool checkCollision(tuple<Point, GLfloat> circle);
     bool decreaseLife(); // returns true if the barrel is destroyed
 };
 

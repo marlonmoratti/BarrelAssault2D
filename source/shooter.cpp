@@ -94,8 +94,9 @@ void Shooter::setAimingAngleTo(GLfloat x, GLfloat y) {
     this->aimingAngle = (abs(angle) > 90) ? 0 : -clamp((double) angle, -30., 30.);
 }
 
-Point Shooter::getPosition() {
-    return Point(x, y);
+tuple<Point, GLfloat> Shooter::getDimensions() {
+    Point center(x, y);
+    return { center, headRadius };
 }
 
 tuple<Point, Point> Shooter::getHitBox() {
@@ -103,6 +104,12 @@ tuple<Point, Point> Shooter::getHitBox() {
         Point(x - headRadius, y - headRadius),
         Point(x + headRadius, y + headRadius)
     };
+}
+
+bool Shooter::checkCollision(tuple<Point, GLfloat> circle) {
+    auto [circleCenter, circleRadius] = circle;
+    GLfloat distance = sqrt(pow(x - circleCenter.x, 2) + pow(y - circleCenter.y, 2));
+    return distance <= (headRadius + circleRadius);
 }
 
 Shot* Shooter::shoot() {
