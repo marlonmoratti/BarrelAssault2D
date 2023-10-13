@@ -3,7 +3,7 @@
 #include "../include/game.h"
 #include "../include/shape.h"
 
-Game::~Game() {
+void Game::freeGameMemory() {
     for (auto shot : shots) {
         delete shot;
     }
@@ -24,6 +24,8 @@ bool Game::isDefeat() {
 }
 
 void Game::movePlayer(GLfloat inc) {
+    if (isVictory() || isDefeat()) return;
+
     auto [pLeftBottom, pRightTop] = player.getHitBox();
     auto [aLeftBottom, aRightTop] = arena.getBoundaries();
 
@@ -51,6 +53,8 @@ void Game::movePlayer(GLfloat inc) {
 }
 
 void Game::moveShot(GLdouble dt) {
+    if (isVictory() || isDefeat()) return;
+
     for (auto shot : shots) {
         shot->move(dt);
         tuple<Point, GLfloat> shotDimensions = shot->getDimensions();
@@ -71,11 +75,17 @@ void Game::moveShot(GLdouble dt) {
             return false;
         });
 
-        if (isVictory()) return;
+        if (isVictory()) {
+            freeGameMemory();
+            return;
+        }
 
         if (shot->isEnemy() && player.checkCollision(shotDimensions)) {
             shot->setCollision();
-            defeat = true; return;
+
+            defeat = true;
+            freeGameMemory();
+            return;
         }
     }
 
@@ -100,7 +110,31 @@ void Game::moveBarrel(GLdouble dt) {
         }
 
         if (barrel->checkCollision({ playerCenter, playerRadius })) {
-            defeat = true; return;
+            defeat = true;
+            freeGameMemory();
+            return;
+        }
+    }
+}
+
+void Game::enemyShooting(GLdouble dt, GLfloat shotsPerSecond) {
+    if (isVictory() || isDefeat()) return;
+
+    static GLint totalTime = 0;
+    totalTime += dt;
+
+    GLint millisecondsPerShot = (1. / shotsPerSecond) * 1000;
+    GLint nShots = totalTime / millisecondsPerShot;
+    totalTime %= millisecondsPerShot;
+
+    
+    for (auto barrel : barrels) {
+        if (auto enemy = barrel->getEnemy()) {
+
+            for (int i = 0; i < nShots; i++) {
+                shots.push_back(enemy->shoot());
+            }
+
         }
     }
 }
@@ -112,10 +146,38 @@ void Game::drawScoreBoard() {
     sprintf(str, "Barris destruidos: %d", score);
 
     GLfloat scale = gHeight/700. * 0.15;
-    GLfloat lw = gHeight/700. * 3;
+    GLfloat lw = gHeight/700. * 1.5;
 
     glPushMatrix();
-        glTranslatef(-gWidth/2. + gWidth/32., gHeight/2. - gHeight/18., 0);
+        glTranslatef(-15*gWidth/32., 4*gHeight/9., 0);
+        glScalef(scale, scale, 1.0);
+        Shape::drawText(str, lw, {1, 1, 1});
+    glPopMatrix();
+}
+
+void Game::drawVictory() {
+    static char str[100];
+    sprintf(str, "Parabens, voce venceu!!!");
+
+    GLfloat scale = gHeight/700. * 0.15;
+    GLfloat lw = gHeight/700. * 1.5;
+
+    glPushMatrix();
+        glTranslatef(-gWidth/4., 0, 0);
+        glScalef(scale, scale, 1.0);
+        Shape::drawText(str, lw, {1, 1, 1});
+    glPopMatrix();
+}
+
+void Game::drawDefeat() {
+    static char str[100];
+    sprintf(str, "Que pena, voce perdeu :(");
+
+    GLfloat scale = gHeight/700. * 0.15;
+    GLfloat lw = gHeight/700. * 1.5;
+
+    glPushMatrix();
+        glTranslatef(-gWidth/4., 0, 0);
         glScalef(scale, scale, 1.0);
         Shape::drawText(str, lw, {1, 1, 1});
     glPopMatrix();

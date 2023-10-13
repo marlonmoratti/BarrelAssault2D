@@ -42,11 +42,14 @@ GLfloat gBarrelSpeed;
 GLint gBarrelLives;
 GLint gScoreToWin;
 GLfloat gEnemyHeadRadius;
+GLfloat gShotsPerSecond;
 GLfloat gDistanceBetweenBarrels;
 
 Game *gGame = nullptr;
 
 void spawnBarrel(GLdouble dt) {
+    if (gGame->isVictory() || gGame->isDefeat()) return;
+
     static GLfloat distance = 0;
 
     distance += gBarrelSpeed * dt;
@@ -81,6 +84,7 @@ void idle() {
     gGame->movePlayer(gPlayerSpeed * timeDiference);
     gGame->moveShot(timeDiference);
     gGame->moveBarrel(timeDiference);
+    gGame->enemyShooting(timeDiference, gShotsPerSecond);
 
     spawnBarrel(timeDiference);
 
@@ -91,14 +95,14 @@ void display() {
     glClear(GL_COLOR_BUFFER_BIT);
 
     if (gGame->isDefeat()) {
-
+        gGame->drawDefeat();
 
         glutSwapBuffers();
         return;
     }
 
     if (gGame->isVictory()) {
-
+        gGame->drawVictory();
 
         glutSwapBuffers();
         return;
@@ -181,12 +185,11 @@ void loadConfiguration() {
 
     XMLElement* inimigo = rootElement->FirstChildElement("inimigo");
     gEnemyHeadRadius = stof(inimigo->Attribute("raioCabeca"));
+    gShotsPerSecond = stof(inimigo->Attribute("tirosPorSegundo"));
 
     gArena = Arena(gWidth, gHeight);
     gPlayer = Shooter(0.0, -gHeight/4., gPlayerHeadRadius, {0, 1, 0});
     gShotMaxDistance = max(gWidth, gHeight);
-
-    // gBarrels.push_back(new Barrel(0, gHeight/4., gBarrelLives, true));
 
     gGame = new Game(gArena, gPlayer, keyStatus, gShots, gBarrels, gScoreToWin);
 }
@@ -216,7 +219,5 @@ int main(int argc, char *argv[]) {
     init();
 
     glutMainLoop();
-
-    delete gGame;
     return 0;
 }

@@ -137,5 +137,5 @@ Shot* Shooter::shoot() {
         norm = sqrt(pow(xv, 2) + pow(yv, 2));
     xv /= norm; yv /= norm;
 
-    return new Shot(p2.x, p2.y, atan2(yv, xv), false);
+    return new Shot(p2.x, p2.y, atan2(yv, xv), isEnemy);
 }

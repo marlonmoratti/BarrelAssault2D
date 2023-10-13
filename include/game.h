@@ -16,17 +16,21 @@ class Game {
     list<Shot*>& shots; list<Barrel*>& barrels;
     int* keyStatus;
     GLint score = 0, scoreToWin;
+
+    void freeGameMemory();
 public:
     Game(Arena& arena, Shooter& player, int* keyStatus, list<Shot*>& shots, list<Barrel*>& barrels, GLint scoreToWin)
             : arena(arena), player(player), keyStatus(keyStatus), shots(shots), barrels(barrels), scoreToWin(scoreToWin) {};
-    ~Game();
 
     bool isVictory();
     bool isDefeat();
     void movePlayer(GLfloat inc);
     void moveShot(GLdouble dt);
     void moveBarrel(GLdouble dt);
+    void enemyShooting(GLdouble dt, GLfloat shotsPerSecond);
     void drawScoreBoard();
+    void drawVictory();
+    void drawDefeat();
 };
 
 #endif
