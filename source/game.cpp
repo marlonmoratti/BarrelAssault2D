@@ -1,4 +1,7 @@
+#include <stdio.h>
+
 #include "../include/game.h"
+#include "../include/shape.h"
 
 Game::~Game() {
     for (auto shot : shots) {
@@ -52,12 +55,14 @@ void Game::moveShot(GLdouble dt) {
         shot->move(dt);
         tuple<Point, GLfloat> shotDimensions = shot->getDimensions();
 
-        barrels.remove_if([shot, shotDimensions](auto barrel) {
-            if (barrel->checkCollision(shotDimensions)) {
+        barrels.remove_if([shot, shotDimensions, this](auto barrel) {
+            if (!shot->isEnemy() && barrel->checkCollision(shotDimensions)) {
 
                 shot->setCollision();
 
                 if (barrel->decreaseLife()) {
+                    if (++score == scoreToWin) victory = true;
+
                     delete barrel;
                     return true;
                 }
@@ -66,7 +71,9 @@ void Game::moveShot(GLdouble dt) {
             return false;
         });
 
-        if (player.checkCollision(shotDimensions)) {
+        if (isVictory()) return;
+
+        if (shot->isEnemy() && player.checkCollision(shotDimensions)) {
             shot->setCollision();
             defeat = true; return;
         }
@@ -82,6 +89,8 @@ void Game::moveShot(GLdouble dt) {
 }
 
 void Game::moveBarrel(GLdouble dt) {
+    if (isVictory() || isDefeat()) return;
+
     for (auto barrel : barrels) {
         barrel->move(dt);
 
@@ -94,4 +103,20 @@ void Game::moveBarrel(GLdouble dt) {
             defeat = true; return;
         }
     }
+}
+
+extern GLint gWidth, gHeight;
+
+void Game::drawScoreBoard() {
+    static char str[100];
+    sprintf(str, "Barris destruidos: %d", score);
+
+    GLfloat scale = gHeight/700. * 0.15;
+    GLfloat lw = gHeight/700. * 3;
+
+    glPushMatrix();
+        glTranslatef(-gWidth/2. + gWidth/32., gHeight/2. - gHeight/18., 0);
+        glScalef(scale, scale, 1.0);
+        Shape::drawText(str, lw, {1, 1, 1});
+    glPopMatrix();
 }

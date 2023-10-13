@@ -20,7 +20,6 @@ void Barrel::drawLives(GLfloat x, GLfloat y, GLfloat scale, GLfloat lw) {
         glScalef(scale, scale, 1.0);
         Shape::drawText(str, lw, {0, 0, 0});
     glPopMatrix();
-
 }
 
 void Barrel::draw() {

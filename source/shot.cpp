@@ -29,3 +29,7 @@ tuple<Point, GLfloat> Shot::getDimensions() {
 bool Shot::isValid() {
     return !collision && sqrt(pow(x - x0, 2) + pow(y - y0, 2)) < gShotMaxDistance;
 }
+
+bool Shot::isEnemy() {
+    return enemy;
+}

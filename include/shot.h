@@ -14,9 +14,9 @@ extern GLfloat gShotRadius, gShotSpeed;
 
 class Shot {
     GLfloat radius, x0, y0, x, y, angle, speed;
-    bool collision = false;
+    bool collision = false, enemy;
 public:
-    Shot(GLfloat x0, GLfloat y0, GLfloat angle) : x0(x0), y0(y0), angle(angle) {
+    Shot(GLfloat x0, GLfloat y0, GLfloat angle, bool isEnemy) : x0(x0), y0(y0), angle(angle), enemy(enemy) {
         radius = gShotRadius;
         x = x0; y = y0;
         speed = gShotSpeed;
@@ -27,6 +27,7 @@ public:
     void setCollision();
     tuple<Point, GLfloat> getDimensions();
     bool isValid();
+    bool isEnemy();
 };
 
 #endif

@@ -40,6 +40,7 @@ GLfloat gBarrelWidth;
 GLfloat gBarrelHeight;
 GLfloat gBarrelSpeed;
 GLint gBarrelLives;
+GLint gScoreToWin;
 GLfloat gEnemyHeadRadius;
 GLfloat gDistanceBetweenBarrels;
 
@@ -113,6 +114,7 @@ void display() {
         barrel->draw();
     }
 
+    gGame->drawScoreBoard();
     glutSwapBuffers();
 }
 
@@ -174,6 +176,7 @@ void loadConfiguration() {
     gBarrelHeight = stof(barril->Attribute("altura"));
     gBarrelSpeed = stof(barril->Attribute("velocidade"));
     gBarrelLives = stoi(barril->Attribute("numeroTiros"));
+    gScoreToWin = stoi(barril->Attribute("nParaGanhar"));
     gDistanceBetweenBarrels = stof(barril->Attribute("distanciaEntre"));
 
     XMLElement* inimigo = rootElement->FirstChildElement("inimigo");
@@ -185,7 +188,7 @@ void loadConfiguration() {
 
     // gBarrels.push_back(new Barrel(0, gHeight/4., gBarrelLives, true));
 
-    gGame = new Game(gArena, gPlayer, keyStatus, gShots, gBarrels);
+    gGame = new Game(gArena, gPlayer, keyStatus, gShots, gBarrels, gScoreToWin);
 }
 
 int main(int argc, char *argv[]) {
