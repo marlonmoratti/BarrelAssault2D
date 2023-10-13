@@ -13,7 +13,7 @@ using namespace std;
 
 class Shooter {
     GLfloat x, y, headRadius, aimingAngle = 0, footAngle = 0;
-    tuple<GLfloat, GLfloat, GLfloat> color;
+    tuple<tuple<GLfloat, GLfloat, GLfloat>, tuple<GLfloat, GLfloat, GLfloat>> color;
     bool isEnemy;
 
     tuple<GLfloat, GLfloat> getFootDimensions();
@@ -23,8 +23,9 @@ class Shooter {
     void drawGun(GLfloat x, GLfloat y, GLfloat width, GLfloat height, GLfloat angle);
     Point getGunAxisPoint();
 public:
-    Shooter(GLfloat x=0, GLfloat y=0, GLfloat headRadius=0, tuple<GLfloat, GLfloat, GLfloat> color={0, 0, 0}, bool isEnemy=false)
-            : x(x), y(y), headRadius(headRadius), color(color), isEnemy(isEnemy) {};
+    Shooter(GLfloat x=0, GLfloat y=0, GLfloat headRadius=0, bool isEnemy=false,
+        tuple<tuple<GLfloat, GLfloat, GLfloat>, tuple<GLfloat, GLfloat, GLfloat>> color={{0, 0, 0}, {0, 0, 0}})
+            : x(x), y(y), headRadius(headRadius), isEnemy(isEnemy), color(color) {};
 
     void draw();
     void move(GLfloat dx, GLfloat dy);

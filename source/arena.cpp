@@ -1,13 +1,14 @@
 #include "../include/arena.h"
 #include "../include/shape.h"
+#include "../include/colors.h"
 
 void Arena::draw() {
     glPushMatrix();
         glTranslatef(0, -height/2., 0);
-        Shape::drawRectangle(width, height, {0, 0, 1});
+        Shape::drawRectangle(width, height, BLUE);
     glPopMatrix();
 
-    Shape::drawLine(Point(-width/2., 0), Point(width/2., 0), lineWidth, {1, 1, 1});
+    Shape::drawLine(Point(-width/2., 0), Point(width/2., 0), lineWidth, BLACK);
 }
 
 tuple<Point, Point> Arena::getBoundaries() {

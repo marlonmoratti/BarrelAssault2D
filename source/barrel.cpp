@@ -7,7 +7,9 @@
 void Barrel::drawBarrel(GLfloat x, GLfloat y, GLfloat width, GLfloat height) {
     glPushMatrix();
         glTranslatef(x, y, 0);
-        Shape::drawRectangle(width, height, {1, 0.5, 0});
+        Shape::drawRectangle(width, height, ORANGE_B);
+        glTranslatef(0, height*0.075, 0);
+        Shape::drawRectangle(width*0.93, height*0.85, ORANGE);
     glPopMatrix();
 }
 
@@ -18,7 +20,7 @@ void Barrel::drawLives(GLfloat x, GLfloat y, GLfloat scale, GLfloat lw) {
     glPushMatrix();
         glTranslatef(x, y, 0);
         glScalef(scale, scale, 1.0);
-        Shape::drawText(str, lw, {0, 0, 0});
+        Shape::drawText(str, lw, BLACK);
     glPopMatrix();
 }
 

@@ -3,6 +3,7 @@
 
 #include "../include/shooter.h"
 #include "../include/shape.h"
+#include "../include/colors.h"
 
 using namespace std;
 
@@ -17,9 +18,12 @@ tuple<GLfloat, GLfloat> Shooter::getGunDimensions() {
 }
 
 void Shooter::drawBody(GLfloat x, GLfloat y, GLfloat radius) {
+    auto [headColor, borderColor] = color;
+
     glPushMatrix();
         glTranslatef(x, y, 0);
-        Shape::drawCircle(radius, color);
+        Shape::drawCircle(radius, borderColor);
+        Shape::drawCircle(radius*0.85, headColor);
     glPopMatrix();
 }
 
@@ -27,7 +31,7 @@ void Shooter::drawFoot(GLfloat x, GLfloat y, GLfloat width, GLfloat height, GLfl
     glPushMatrix();
         glTranslatef(x, y, 0);
         glRotatef(angle, 1, 0, 0);
-        Shape::drawRectangle(width, height, {0, 0, 0});
+        Shape::drawRectangle(width, height, BLACK);
     glPopMatrix();
 }
 
@@ -35,7 +39,9 @@ void Shooter::drawGun(GLfloat x, GLfloat y, GLfloat width, GLfloat height, GLflo
     glPushMatrix();
         glTranslatef(x, y, 0);
         glRotatef(angle, 0, 0, 1);
-        Shape::drawRectangle(width, height, {1, 0, 0});
+        Shape::drawRectangle(width, height, RED_B);
+        glTranslatef(0, headRadius*0.125, 0);
+        Shape::drawRectangle(width - headRadius*0.25, height - headRadius*0.25, RED);
     glPopMatrix();
 }
 

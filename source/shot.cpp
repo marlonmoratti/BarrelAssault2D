@@ -2,13 +2,14 @@
 
 #include "../include/shot.h"
 #include "../include/shape.h"
+#include "../include/colors.h"
 
 extern GLfloat gShotMaxDistance;
 
 void Shot::draw() {
     glPushMatrix();
         glTranslatef(x, y, 0);
-        Shape::drawCircle(radius, {1, 1, 1});
+        Shape::drawCircle(radius, BLACK);
     glPopMatrix();
 }
 

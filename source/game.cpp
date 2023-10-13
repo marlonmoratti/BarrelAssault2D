@@ -2,6 +2,7 @@
 
 #include "../include/game.h"
 #include "../include/shape.h"
+#include "../include/colors.h"
 
 void Game::freeGameMemory() {
     for (auto shot : shots) {
@@ -151,7 +152,7 @@ void Game::drawScoreBoard() {
     glPushMatrix();
         glTranslatef(-15*gWidth/32., 4*gHeight/9., 0);
         glScalef(scale, scale, 1.0);
-        Shape::drawText(str, lw, {1, 1, 1});
+        Shape::drawText(str, lw, WHITE);
     glPopMatrix();
 }
 
@@ -165,7 +166,7 @@ void Game::drawVictory() {
     glPushMatrix();
         glTranslatef(-gWidth/4., 0, 0);
         glScalef(scale, scale, 1.0);
-        Shape::drawText(str, lw, {1, 1, 1});
+        Shape::drawText(str, lw, WHITE);
     glPopMatrix();
 }
 
@@ -179,6 +180,6 @@ void Game::drawDefeat() {
     glPushMatrix();
         glTranslatef(-gWidth/4., 0, 0);
         glScalef(scale, scale, 1.0);
-        Shape::drawText(str, lw, {1, 1, 1});
+        Shape::drawText(str, lw, WHITE);
     glPopMatrix();
 }

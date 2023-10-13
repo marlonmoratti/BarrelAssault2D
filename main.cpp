@@ -13,6 +13,7 @@
 #include "include/shot.h"
 #include "include/barrel.h"
 #include "include/game.h"
+#include "include/colors.h"
 
 using namespace std;
 using namespace tinyxml2;
@@ -188,7 +189,7 @@ void loadConfiguration() {
     gShotsPerSecond = stof(inimigo->Attribute("tirosPorSegundo"));
 
     gArena = Arena(gWidth, gHeight);
-    gPlayer = Shooter(0.0, -gHeight/4., gPlayerHeadRadius, {0, 1, 0});
+    gPlayer = Shooter(0.0, -gHeight/4., gPlayerHeadRadius, false, {GREEN, GREEN_B});
     gShotMaxDistance = max(gWidth, gHeight);
 
     gGame = new Game(gArena, gPlayer, keyStatus, gShots, gBarrels, gScoreToWin);

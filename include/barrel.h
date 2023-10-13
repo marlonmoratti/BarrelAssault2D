@@ -7,6 +7,7 @@
 #include <tuple>
 
 #include "shooter.h"
+#include "colors.h"
 
 using namespace std;
 
@@ -26,7 +27,7 @@ public:
         speed = gBarrelSpeed;
 
         if (withEnemy) shooter = new Shooter(
-            x - width/10., y + height/2., gEnemyHeadRadius, {0.5, 0, 1}, withEnemy
+            x - width/10., y + height/2., gEnemyHeadRadius, withEnemy, {PURPLE, PURPLE_B}
         );
     };
 
