@@ -14,14 +14,15 @@ using namespace std;
 extern GLfloat gBarrelWidth, gBarrelHeight, gBarrelSpeed, gEnemyHeadRadius;
 
 class Barrel {
-    GLfloat x, y, width, height, speed;
+    GLfloat x0, y0, x, y, width, height, speed;
     GLint lives;
     Shooter* shooter = nullptr;
 
     void drawBarrel(GLfloat x, GLfloat y, GLfloat width, GLfloat height);
     void drawLives(GLfloat x, GLfloat y, GLfloat scale, GLfloat lw);
 public:
-    Barrel(GLfloat x=0, GLfloat y=0, GLint lives=0, bool withEnemy=false) : x(x), y(y), lives(lives) {
+    Barrel(GLfloat x0=0, GLfloat y0=0, GLint lives=0, bool withEnemy=false) : x0(x0), y0(y0), lives(lives) {
+        x = x0; y = y0;
         width = gBarrelWidth;
         height = gBarrelHeight;
         speed = gBarrelSpeed;
@@ -38,6 +39,7 @@ public:
     Shooter* getEnemy();
     bool checkCollision(tuple<Point, GLfloat> circle);
     bool decreaseLife(); // returns true if the barrel is destroyed
+    bool isValid();
 };
 
 #endif

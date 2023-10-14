@@ -116,10 +116,19 @@ void Game::moveBarrel(GLdouble dt) {
             return;
         }
     }
+
+    barrels.remove_if([](auto barrel) {
+        bool isValid = barrel->isValid();
+        if (!isValid) {
+            delete barrel;
+        }
+        return !isValid;
+    });
 }
 
 void Game::enemyShooting(GLdouble dt, GLfloat shotsPerSecond) {
     if (isVictory() || isDefeat()) return;
+    if (shotsPerSecond < 1e-6) return;
 
     static GLint totalTime = 0;
     totalTime += dt;

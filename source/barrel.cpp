@@ -4,6 +4,8 @@
 #include "../include/barrel.h"
 #include "../include/shape.h"
 
+extern GLfloat gBarrelMaxDistance;
+
 void Barrel::drawBarrel(GLfloat x, GLfloat y, GLfloat width, GLfloat height) {
     glPushMatrix();
         glTranslatef(x, y, 0);
@@ -50,14 +52,13 @@ bool Barrel::checkCollision(tuple<Point, GLfloat> circle) {
             nearestY = max(barrelLeftBottom.y, min(circleCenter.y, barrelRightTop.y));
     GLfloat distance = sqrt(pow(nearestX - circleCenter.x, 2) + pow(nearestY - circleCenter.y, 2));
 
-    // return circleCenter.x >= barrelLeftBottom.x
-    //     && circleCenter.x <= barrelRightTop.x
-    //     && circleCenter.y >= barrelLeftBottom.y
-    //     && circleCenter.y <= barrelRightTop.y;
-
     return distance <= circleRadius;
 }
 
 bool Barrel::decreaseLife() {
     return !(--lives);
+}
+
+bool Barrel::isValid() {
+    return sqrt(pow(x - x0, 2) + pow(y - y0, 2)) < gBarrelMaxDistance;
 }

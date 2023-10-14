@@ -41,12 +41,13 @@ GLfloat gBarrelWidth;
 GLfloat gBarrelHeight;
 GLfloat gBarrelSpeed;
 GLint gBarrelLives;
-GLint gScoreToWin;
+GLfloat gBarrelMaxDistance;
 GLfloat gEnemyHeadRadius;
 GLfloat gShotsPerSecond;
 GLfloat gDistanceBetweenBarrels;
 
 Game *gGame = nullptr;
+GLint gScoreToWin;
 
 void spawnBarrel(GLdouble dt) {
     if (gGame->isVictory() || gGame->isDefeat()) return;
@@ -191,6 +192,7 @@ void loadConfiguration() {
     gArena = Arena(gWidth, gHeight);
     gPlayer = Shooter(0.0, -gHeight/4., gPlayerHeadRadius, false, {GREEN, GREEN_B});
     gShotMaxDistance = max(gWidth, gHeight);
+    gBarrelMaxDistance = gHeight;
 
     gGame = new Game(gArena, gPlayer, keyStatus, gShots, gBarrels, gScoreToWin);
 }
