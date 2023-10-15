@@ -173,7 +173,7 @@ void Game::drawVictory() {
     GLfloat lw = gHeight/700. * 1.5;
 
     glPushMatrix();
-        glTranslatef(-gWidth/4., 0, 0);
+        glTranslatef(-gWidth/4., gHeight/10., 0);
         glScalef(scale, scale, 1.0);
         Shape::drawText(str, lw, WHITE);
     glPopMatrix();
@@ -187,7 +187,7 @@ void Game::drawDefeat() {
     GLfloat lw = gHeight/700. * 1.5;
 
     glPushMatrix();
-        glTranslatef(-gWidth/4., 0, 0);
+        glTranslatef(-gWidth/4., gHeight/10., 0);
         glScalef(scale, scale, 1.0);
         Shape::drawText(str, lw, WHITE);
     glPopMatrix();

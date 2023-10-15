@@ -49,6 +49,10 @@ GLfloat gDistanceBetweenBarrels;
 Game *gGame = nullptr;
 GLint gScoreToWin;
 
+double _rand(double lo, double hi) {
+    return ((double) rand()/RAND_MAX) * (hi - lo) + lo;
+}
+
 void spawnBarrel(GLdouble dt) {
     if (gGame->isVictory() || gGame->isDefeat()) return;
 
@@ -57,7 +61,8 @@ void spawnBarrel(GLdouble dt) {
     distance += gBarrelSpeed * dt;
     if (!gBarrels.empty() && distance < (gBarrelHeight + gDistanceBetweenBarrels)) return;
 
-    GLfloat x = (rand() % ((int) (gWidth - gBarrelWidth)/2)) * (-1 * (rand() % 2));
+    GLfloat bound = (gWidth - gBarrelWidth)/2;
+    GLfloat x = _rand(-bound, bound);
     GLfloat y = gHeight/2. - gBarrelHeight;
 
     gBarrels.push_back(
@@ -94,8 +99,6 @@ void idle() {
 }
 
 void display() {
-    glClear(GL_COLOR_BUFFER_BIT);
-
     if (gGame->isDefeat()) {
         gGame->drawDefeat();
 
@@ -110,6 +113,7 @@ void display() {
         return;
     }
 
+    glClear(GL_COLOR_BUFFER_BIT);
     gArena.draw(); gPlayer.draw();
 
     for (auto shot : gShots) {
@@ -147,7 +151,7 @@ void mouseMotion(int x, int y) {
 }
 
 void mouseClick(int button, int state, int x, int y) {
-    if (button == 0 && state == 0) {
+    if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
         gShots.push_back(gPlayer.shoot());
     }
 }
