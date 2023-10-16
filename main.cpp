@@ -99,6 +99,28 @@ void idle() {
 }
 
 void display() {
+    static bool endGame = false;
+
+    if (!endGame) {
+        glClear(GL_COLOR_BUFFER_BIT);
+        gArena.draw(); gPlayer.draw();
+
+        for (auto shot : gShots) {
+            shot->draw();
+        }
+
+        for (auto barrel : gBarrels) {
+            barrel->draw();
+        }
+
+        gGame->drawScoreBoard();
+        glutSwapBuffers();
+    }
+
+    if (!endGame && (gGame->isVictory() || gGame->isDefeat())) {
+        endGame = true;
+    }
+
     if (gGame->isDefeat()) {
         gGame->drawDefeat();
 
@@ -112,20 +134,6 @@ void display() {
         glutSwapBuffers();
         return;
     }
-
-    glClear(GL_COLOR_BUFFER_BIT);
-    gArena.draw(); gPlayer.draw();
-
-    for (auto shot : gShots) {
-        shot->draw();
-    }
-
-    for (auto barrel : gBarrels) {
-        barrel->draw();
-    }
-
-    gGame->drawScoreBoard();
-    glutSwapBuffers();
 }
 
 void keyDown(unsigned char key, int x, int y) {
