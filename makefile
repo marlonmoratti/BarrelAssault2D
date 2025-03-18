@@ -1,8 +1,8 @@
 all:
-	g++ -o trabalhocg main.cpp ./source/*.cpp ./tinyxml2/tinyxml2.cpp -lGL -lGLU -lglut -std=c++17
+	g++ -o main main.cpp ./source/*.cpp ./tinyxml2/tinyxml2.cpp -lGL -lGLU -lglut -std=c++17
 
 clean:
-	rm trabalhocg
+	rm main
 
 run: all
-	./trabalhocg
+	./main
